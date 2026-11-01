@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مواقيت الصلاة في مصر</title>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#10b981">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background-color: #f3f4f6; color: #1f2937; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 1rem; }
+    .container { width: 100%; max-width: 480px; background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 1.5rem; }
+    header { text-align: center; margin-bottom: 1.5rem; }
+    h1 { color: #065f46; font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .select-box { margin-bottom: 1.5rem; }
+    label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151; }
+    select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; background-color: #f9fafb; outline: none; }
+    .next-prayer { background: linear-gradient(135deg, #10b981, #047857); color: white; border-radius: 0.75rem; padding: 1rem; text-align: center; margin-bottom: 1.5rem; }
+    .next-prayer p { font-size: 0.875rem; opacity: 0.9; }
+    .next-prayer h2 { font-size: 1.75rem; margin: 0.25rem 0; }
+    .prayers-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .prayer-card { display: flex; justify-content: space-between; align-items: center; padding: 0.875rem 1rem; border-radius: 0.5rem; background: #f9fafb; border-right: 4px solid #10b981; }
+    .prayer-name { font-weight: 600; }
+    .prayer-time { font-weight: 700; color: #065f46; direction: ltr; }
+    .btn-notify { width: 100%; margin-top: 1.5rem; padding: 0.875rem; background-color: #047857; color: white; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; }
+    .hint-box { margin-top: 1rem; padding: 0.75rem; background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 0.5rem; color: #065f46; font-size: 0.825rem; text-align: center; line-height: 1.4; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>🕌 مواقيت الصلاة - مصر</h1>
+      <p id="current-date" style="color: #6b7280; font-size: 0.875rem;"></p>
+    </header>
+
+    <div class="select-box">
+      <label for="citySelect">اختر المحافظة:</label>
+      <select id="citySelect"></select>
+    </div>
+
+    <div class="next-prayer">
+      <p>الصلاة القادمة</p>
+      <h2 id="next-prayer-name">--</h2>
+      <p id="next-prayer-time">--:--</p>
+    </div>
+
+    <div class="prayers-list">
+      <div class="prayer-card"><span class="prayer-name">الفجر</span><span class="prayer-time" id="fajr">--:--</span></div>
+      <div class="prayer-card"><span class="prayer-name">الشروق</span><span class="prayer-time" id="sunrise">--:--</span></div>
+      <div class="prayer-card"><span class="prayer-name">الظهر</span><span class="prayer-time" id="dhuhr">--:--</span></div>
+      <div class="prayer-card"><span class="prayer-name">العصر</span><span class="prayer-time" id="asr">--:--</span></div>
+      <div class="prayer-card"><span class="prayer-name">المغرب</span><span class="prayer-time" id="maghrib">--:--</span></div>
+      <div class="prayer-card"><span class="prayer-name">العشاء</span><span class="prayer-time" id="isha">--:--</span></div>
+    </div>
+
+    <button class="btn-notify" onclick="enableNotifications()">تفعيل إشعارات الأذان</button>
+
+    <div class="hint-box">
+      💡 <b>تنبيه:</b> لضمان وصول إشعارات الأذان بدون إنترنت، يرجى إبقاء التطبيق يعمل في الخلفية وعدم إغلاقه كلياً.
+    </div>
+  </div>
+
+  <script>
+    // 1. المحافظات المصرية والإحداثيات
+    const cities = {
+      Cairo: { name: "القاهرة", lat: 30.0444, lng: 31.2357 },
+      Alexandria: { name: "الإسكندرية", lat: 31.2001, lng: 29.9187 },
+      Giza: { name: "الجيزة", lat: 30.0131, lng: 31.2089 },
+      Dakahlia: { name: "المنصورة (الدقهلية)", lat: 31.0409, lng: 31.3785 },
+      Gharbia: { name: "طنطا (الغربية)", lat: 30.7865, lng: 31.0004 },
+      Sharqia: { name: "الزقازيق (الشرقية)", lat: 30.5877, lng: 31.5020 },
+      Monufia: { name: "شبين الكوم (المنوفية)", lat: 30.5503, lng: 31.0106 },
+      Qalyubia: { name: "بنها (القليوبية)", lat: 30.4628, lng: 31.1829 },
+      Beheira: { name: "دمنهور (البحيرة)", lat: 31.0379, lng: 30.4688 },
+      KafrElSheikh: { name: "كفر الشيخ", lat: 31.1107, lng: 30.9388 },
+      Faiyum: { name: "الفيوم", lat: 29.3084, lng: 30.8428 },
+      BeniSuef: { name: "بني سويف", lat: 29.0661, lng: 31.0994 },
+      Minya: { name: "المنيا", lat: 28.1099, lng: 30.7503 },
+      Asyut: { name: "أسيوط", lat: 27.1809, lng: 31.1837 },
+      Sohag: { name: "سوهاج", lat: 26.5569, lng: 31.6948 },
+      Qena: { name: "قنا", lat: 26.1551, lng: 32.7160 },
+      Luxor: { name: "الأقصر", lat: 25.6872, lng: 32.6396 },
+      Aswan: { name: "أسوان", lat: 24.0889, lng: 32.8998 },
+      RedSea: { name: "الغردقة (البحر الأحمر)", lat: 27.2579, lng: 33.8116 },
+      NewValley: { name: "الخارجة (الوادي الجديد)", lat: 25.4514, lng: 30.5464 },
+      Matrouh: { name: "مرسى مطروح", lat: 31.3543, lng: 27.2373 },
+      PortSaid: { name: "بورسعيد", lat: 31.2653, lng: 32.3019 },
+      Ismailia: { name: "الإسماعيلية", lat: 30.5965, lng: 32.2715 },
+      Suez: { name: "السويس", lat: 29.9668, lng: 32.5498 },
+      NorthSinai: { name: "العريش (شمال سيناء)", lat: 31.1316, lng: 33.8032 },
+      SouthSinai: { name: "شرم الشيخ (جنوب سيناء)", lat: 27.9158, lng: 34.3299 }
+    };
+
+    // 2. معادلات حساب مواقيت الصلاة محلياً (هيئة المساحة المصرية)
+    function calculateEgyptianPrayerTimes(lat, lng, date) {
+      const d = new Date(date);
+      const dayOfYear = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+      const B = (2 * Math.PI * (dayOfYear - 81)) / 364;
+      const EoT = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+      const decl = 23.45 * Math.sin((2 * Math.PI * (284 + dayOfYear)) / 365);
+      
+      const timezone = 2; // التوقيت القياسي لمصر (UTC+2)
+      const longitudeHour = lng / 15;
+      
+      function getTimeForAngle(angle, isMorning) {
+        const radLat = lat * Math.PI / 180;
+        const radDecl = decl * Math.PI / 180;
+        const radAngle = angle * Math.PI / 180;
+        
+        let cosH = (Math.sin(radAngle) - Math.sin(radLat) * Math.sin(radDecl)) / (Math.cos(radLat) * Math.cos(radDecl));
+        if (cosH > 1) cosH = 1; if (cosH < -1) cosH = -1;
+        
+        let H = Math.acos(cosH) * 180 / Math.PI / 15;
+        if (isMorning) H = 24 - H;
+        
+        const T = H + 12 - (EoT / 60) - (lng / 15) + timezone;
+        return (T + 24) % 24;
+      }
+
+      function getAsrTime() {
+        const radLat = lat * Math.PI / 180;
+        const radDecl = decl * Math.PI / 180;
+        const shadowLength = 1 + Math.tan(Math.abs(radLat - radDecl));
+        const angle = Math.atan(1 / shadowLength) * 180 / Math.PI;
+        return getTimeForAngle(angle, false);
+      }
+
+      const fajr = getTimeForAngle(-19.5, true);    // الفجر: 19.5 درجة (الهيئة المصرية)
+      const sunrise = getTimeForAngle(-0.833, true);
+      const dhuhr = 12 - (EoT / 60) - (lng / 15) + timezone;
+      const asr = getAsrTime();
+      const maghrib = getTimeForAngle(-0.833, false);
+      const isha = getTimeForAngle(-17.5, false);    // العشاء: 17.5 درجة (الهيئة المصرية)
+
+      return { fajr, sunrise, dhuhr, asr, maghrib, isha };
+    }
+
+    function formatTime(hours) {
+      let h = Math.floor(hours);
+      let m = Math.floor((hours - h) * 60);
+      const ampm = h >= 12 ? 'م' : 'ص';
+      h = h % 12 || 12;
+      return `${h}:${m < 10 ? '0' : ''}${m} ${ampm}`;
+    }
+
+    // 3. إدارة واجهة المستخدم
+    const selectElem = document.getElementById('citySelect');
+    Object.keys(cities).forEach(key => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = cities[key].name;
+      selectElem.appendChild(opt);
+    });
+
+    const savedCity = localStorage.getItem('userCity') || 'Cairo';
+    selectElem.value = savedCity;
+
+    function updateUI() {
+      const cityKey = selectElem.value;
+      localStorage.setItem('userCity', cityKey);
+      const city = cities[cityKey];
+      
+      const now = new Date();
+      document.getElementById('current-date').textContent = now.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      const times = calculateEgyptianPrayerTimes(city.lat, city.lng, now);
+
+      document.getElementById('fajr').textContent = formatTime(times.fajr);
+      document.getElementById('sunrise').textContent = formatTime(times.sunrise);
+      document.getElementById('dhuhr').textContent = formatTime(times.dhuhr);
+      document.getElementById('asr').textContent = formatTime(times.asr);
+      document.getElementById('maghrib').textContent = formatTime(times.maghrib);
+      document.getElementById('isha').textContent = formatTime(times.isha);
+
+      // تحديد الصلاة القادمة
+      const currentDecimalHour = now.getHours() + now.getMinutes() / 60;
+      const prayerList = [
+        { name: 'الفجر', time: times.fajr },
+        { name: 'الشروق', time: times.sunrise },
+        { name: 'الظهر', time: times.dhuhr },
+        { name: 'العصر', time: times.asr },
+        { name: 'المغرب', time: times.maghrib },
+        { name: 'العشاء', time: times.isha }
+      ];
+
+      let next = prayerList.find(p => p.time > currentDecimalHour) || prayerList[0];
+      document.getElementById('next-prayer-name').textContent = next.name;
+      document.getElementById('next-prayer-time').textContent = formatTime(next.time);
+    }
+
+    selectElem.addEventListener('change', updateUI);
+    updateUI();
+
+    // 4. تسجيل الـ Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+
+    function enableNotifications() {
+      Notification.requestPermission().then(perm => {
+        if (perm === 'granted') alert('تم تفعيل إشعارات الأذان بنجاح!');
+      });
+    }
+  </script>
+</body>
+</html>
