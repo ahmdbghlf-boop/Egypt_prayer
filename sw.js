@@ -1,4 +1,4 @@
-const CACHE_NAME = 'egypt-prayer-v2';
+const CACHE_NAME = 'egypt-prayer-v3';
 const ASSETS = [
   './',
   './index.html',
