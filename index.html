@@ -5,25 +5,112 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>مواقيت الصلاة في مصر</title>
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#10b981">
+  <meta name="theme-color" content="#0f766e">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: #f3f4f6; color: #1f2937; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 1rem; }
-    .container { width: 100%; max-width: 480px; background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 1.5rem; }
+    
+    /* خلفية متدرجة بألوان الأخضر والأزرق العصري */
+    body { 
+      background: linear-gradient(135deg, #022c22 0%, #0f766e 40%, #1e3a8a 100%);
+      color: #1f2937; 
+      min-height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      padding: 1.5rem 1rem; 
+    }
+    
+    .container { 
+      width: 100%; 
+      max-width: 480px; 
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(10px);
+      border-radius: 1.25rem; 
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2); 
+      padding: 1.5rem; 
+    }
+
     header { text-align: center; margin-bottom: 1.5rem; }
-    h1 { color: #065f46; font-size: 1.5rem; margin-bottom: 0.5rem; }
-    .select-box { margin-bottom: 1.5rem; }
+    h1 { color: #065f46; font-size: 1.6rem; margin-bottom: 0.25rem; }
+    
+    .select-box { margin-bottom: 1.25rem; }
     label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151; }
-    select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; background-color: #f9fafb; outline: none; }
-    .next-prayer { background: linear-gradient(135deg, #10b981, #047857); color: white; border-radius: 0.75rem; padding: 1rem; text-align: center; margin-bottom: 1.5rem; }
+    select { 
+      width: 100%; 
+      padding: 0.75rem; 
+      border: 1px solid #cbd5e1; 
+      border-radius: 0.6rem; 
+      font-size: 1rem; 
+      background-color: #f8fafc; 
+      outline: none; 
+      color: #0f172a;
+      font-weight: 500;
+    }
+    
+    /* كارت الصلاة القادمة بتدرج أزرق/أخضر خاص */
+    .next-prayer { 
+      background: linear-gradient(135deg, #0d9488, #2563eb); 
+      color: white; 
+      border-radius: 1rem; 
+      padding: 1.25rem; 
+      text-align: center; 
+      margin-bottom: 1.25rem; 
+      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+    }
     .next-prayer p { font-size: 0.875rem; opacity: 0.9; }
-    .next-prayer h2 { font-size: 1.75rem; margin: 0.25rem 0; }
-    .prayers-list { display: flex; flex-direction: column; gap: 0.75rem; }
-    .prayer-card { display: flex; justify-content: space-between; align-items: center; padding: 0.875rem 1rem; border-radius: 0.5rem; background: #f9fafb; border-right: 4px solid #10b981; }
-    .prayer-name { font-weight: 600; }
-    .prayer-time { font-weight: 700; color: #065f46; direction: ltr; }
-    .btn-notify { width: 100%; margin-top: 1.5rem; padding: 0.875rem; background-color: #047857; color: white; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; }
-    .hint-box { margin-top: 1rem; padding: 0.75rem; background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 0.5rem; color: #065f46; font-size: 0.825rem; text-align: center; line-height: 1.4; }
+    .next-prayer h2 { font-size: 1.8rem; margin: 0.2rem 0; }
+    .remaining-time { 
+      font-size: 1.15rem; 
+      font-weight: 700; 
+      background: rgba(255, 255, 255, 0.2); 
+      padding: 0.4rem 1rem; 
+      border-radius: 20px; 
+      display: inline-block; 
+      margin-top: 0.5rem; 
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .prayers-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .prayer-card { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      padding: 0.85rem 1rem; 
+      border-radius: 0.6rem; 
+      background: #f8fafc; 
+      border-right: 4px solid #0d9488; 
+      transition: transform 0.2s;
+    }
+    .prayer-card:hover { transform: translateX(-3px); }
+    .prayer-name { font-weight: 600; color: #334155; }
+    .prayer-time { font-weight: 700; color: #0284c7; direction: ltr; }
+    
+    .btn-notify { 
+      width: 100%; 
+      margin-top: 1.25rem; 
+      padding: 0.875rem; 
+      background: linear-gradient(135deg, #059669, #0284c7); 
+      color: white; 
+      border: none; 
+      border-radius: 0.6rem; 
+      font-size: 1rem; 
+      font-weight: 600; 
+      cursor: pointer; 
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .btn-notify:active { opacity: 0.9; }
+
+    .hint-box { 
+      margin-top: 1rem; 
+      padding: 0.75rem; 
+      background-color: #f0fdf4; 
+      border: 1px solid #bbf7d0; 
+      border-radius: 0.6rem; 
+      color: #166534; 
+      font-size: 0.8rem; 
+      text-align: center; 
+      line-height: 1.4; 
+    }
   </style>
 </head>
 <body>
@@ -31,7 +118,7 @@
   <div class="container">
     <header>
       <h1>🕌 مواقيت الصلاة - مصر</h1>
-      <p id="current-date" style="color: #6b7280; font-size: 0.875rem;"></p>
+      <p id="current-date" style="color: #64748b; font-size: 0.85rem;"></p>
     </header>
 
     <div class="select-box">
@@ -43,6 +130,7 @@
       <p>الصلاة القادمة</p>
       <h2 id="next-prayer-name">--</h2>
       <p id="next-prayer-time">--:--</p>
+      <div class="remaining-time" id="remaining-timer">متبقي --:--:--</div>
     </div>
 
     <div class="prayers-list">
@@ -62,7 +150,6 @@
   </div>
 
   <script>
-    // 1. المحافظات المصرية والإحداثيات
     const cities = {
       Cairo: { name: "القاهرة", lat: 30.0444, lng: 31.2357 },
       Alexandria: { name: "الإسكندرية", lat: 31.2001, lng: 29.9187 },
@@ -92,28 +179,22 @@
       SouthSinai: { name: "شرم الشيخ (جنوب سيناء)", lat: 27.9158, lng: 34.3299 }
     };
 
-    // 2. معادلات حساب مواقيت الصلاة محلياً (هيئة المساحة المصرية)
     function calculateEgyptianPrayerTimes(lat, lng, date) {
       const d = new Date(date);
       const dayOfYear = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
       const B = (2 * Math.PI * (dayOfYear - 81)) / 364;
       const EoT = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
       const decl = 23.45 * Math.sin((2 * Math.PI * (284 + dayOfYear)) / 365);
-      
-      const timezone = 2; // التوقيت القياسي لمصر (UTC+2)
-      const longitudeHour = lng / 15;
+      const timezone = 2;
       
       function getTimeForAngle(angle, isMorning) {
         const radLat = lat * Math.PI / 180;
         const radDecl = decl * Math.PI / 180;
         const radAngle = angle * Math.PI / 180;
-        
         let cosH = (Math.sin(radAngle) - Math.sin(radLat) * Math.sin(radDecl)) / (Math.cos(radLat) * Math.cos(radDecl));
         if (cosH > 1) cosH = 1; if (cosH < -1) cosH = -1;
-        
         let H = Math.acos(cosH) * 180 / Math.PI / 15;
         if (isMorning) H = 24 - H;
-        
         const T = H + 12 - (EoT / 60) - (lng / 15) + timezone;
         return (T + 24) % 24;
       }
@@ -126,14 +207,14 @@
         return getTimeForAngle(angle, false);
       }
 
-      const fajr = getTimeForAngle(-19.5, true);    // الفجر: 19.5 درجة (الهيئة المصرية)
-      const sunrise = getTimeForAngle(-0.833, true);
-      const dhuhr = 12 - (EoT / 60) - (lng / 15) + timezone;
-      const asr = getAsrTime();
-      const maghrib = getTimeForAngle(-0.833, false);
-      const isha = getTimeForAngle(-17.5, false);    // العشاء: 17.5 درجة (الهيئة المصرية)
-
-      return { fajr, sunrise, dhuhr, asr, maghrib, isha };
+      return {
+        fajr: getTimeForAngle(-19.5, true),
+        sunrise: getTimeForAngle(-0.833, true),
+        dhuhr: 12 - (EoT / 60) - (lng / 15) + timezone,
+        asr: getAsrTime(),
+        maghrib: getTimeForAngle(-0.833, false),
+        isha: getTimeForAngle(-17.5, false)
+      };
     }
 
     function formatTime(hours) {
@@ -144,7 +225,6 @@
       return `${h}:${m < 10 ? '0' : ''}${m} ${ampm}`;
     }
 
-    // 3. إدارة واجهة المستخدم
     const selectElem = document.getElementById('citySelect');
     Object.keys(cities).forEach(key => {
       const opt = document.createElement('option');
@@ -155,6 +235,8 @@
 
     const savedCity = localStorage.getItem('userCity') || 'Cairo';
     selectElem.value = savedCity;
+
+    let countdownInterval;
 
     function updateUI() {
       const cityKey = selectElem.value;
@@ -173,8 +255,7 @@
       document.getElementById('maghrib').textContent = formatTime(times.maghrib);
       document.getElementById('isha').textContent = formatTime(times.isha);
 
-      // تحديد الصلاة القادمة
-      const currentDecimalHour = now.getHours() + now.getMinutes() / 60;
+      const currentDecimalHour = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
       const prayerList = [
         { name: 'الفجر', time: times.fajr },
         { name: 'الشروق', time: times.sunrise },
@@ -184,15 +265,43 @@
         { name: 'العشاء', time: times.isha }
       ];
 
-      let next = prayerList.find(p => p.time > currentDecimalHour) || prayerList[0];
+      let next = prayerList.find(p => p.time > currentDecimalHour);
+      let isNextDay = false;
+
+      if (!next) {
+        next = prayerList[0];
+        isNextDay = true;
+      }
+
       document.getElementById('next-prayer-name').textContent = next.name;
       document.getElementById('next-prayer-time').textContent = formatTime(next.time);
+
+      clearInterval(countdownInterval);
+      
+      function startCountdown() {
+        const currentTime = new Date();
+        let targetHours = next.time;
+        if (isNextDay) targetHours += 24;
+
+        let diffHours = targetHours - (currentTime.getHours() + currentTime.getMinutes() / 60 + currentTime.getSeconds() / 3600);
+        if (diffHours < 0) diffHours += 24;
+
+        const totalSeconds = Math.floor(diffHours * 3600);
+        const hrs = Math.floor(totalSeconds / 3600);
+        const mins = Math.floor((totalSeconds % 3600) / 60);
+        const secs = totalSeconds % 60;
+
+        const pad = (n) => n < 10 ? '0' + n : n;
+        document.getElementById('remaining-timer').textContent = `متبقي ${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
+      }
+
+      startCountdown();
+      countdownInterval = setInterval(startCountdown, 1000);
     }
 
     selectElem.addEventListener('change', updateUI);
     updateUI();
 
-    // 4. تسجيل الـ Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
