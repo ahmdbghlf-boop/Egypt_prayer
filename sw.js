@@ -1,9 +1,10 @@
-const CACHE_NAME = 'egypt-prayer-v3';
+const CACHE_NAME = 'egypt-prayer-v4'; // تغيير النسخة هنا يجبر المتصفح على تحميل التصميم الزجاجي الجديد
 const ASSETS = [
   './',
   './index.html',
   './manifest.json'
 ];
+
 
 // حفظ الملفات للعمل بدون إنترنت
 self.addEventListener('install', (e) => {
