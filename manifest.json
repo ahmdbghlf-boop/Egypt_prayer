@@ -1,0 +1,23 @@
+{
+  "name": "مواقيت الصلاة في مصر",
+  "short_name": "مواقيتي",
+  "description": "تطبيق لحساب مواقيت الصلاة للمحافظات المصرية بدون إنترنت",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#10b981",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2928/2928134.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2928/2928134.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
